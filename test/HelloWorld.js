@@ -28,4 +28,30 @@ describe("HelloWorld unit tests", async () => {
 		});
 	});
 
+	describe("Set new message", async () => {
+		describe("Successful cases", async () => {
+			it("properly changes the message", async () => {
+				const {helloWorld, owner} = await loadFixture(deployHelloWorldFixture);
+
+				await helloWorld.connect(owner).setMessage("New message");
+				const updatedMessage = await helloWorld.getMessage();
+
+				assert(updatedMessage === "New message", "New message not set to proper value");
+			});
+			it("emits MessageChanged event", async () => {
+				const {helloWorld, owner} = await loadFixture(deployHelloWorldFixture);
+
+				await expect(helloWorld.connect(owner).setMessage("New message")).to.emit(helloWorld, "MessageChanged").withArgs("New message");
+			});
+		});
+
+		describe("Failure cases", async () => {
+			it("reverts when other account tries to change message", async () => {
+
+			});
+			it("reverts when new message is empty", async () => {
+
+			});
+		});
+	});
 });
