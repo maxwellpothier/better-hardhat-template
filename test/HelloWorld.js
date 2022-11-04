@@ -9,12 +9,12 @@ const { ethers } = require("hardhat");
 describe("HelloWorld unit tests", async () => {
 	// Function acts like a "beforeEach"
 	const deployHelloWorldFixture = async () => {
-		const [owner] = await ethers.getSigners();
+		const [owner, otherAccount] = await ethers.getSigners();
 
 		const HelloWorld = await ethers.getContractFactory("HelloWorld");
 		const helloWorld = await HelloWorld.deploy("Initial message");
 
-		return {helloWorld, owner};
+		return {helloWorld, owner, otherAccount};
 	}
 
 	describe("Deployment", async () => {
@@ -47,10 +47,14 @@ describe("HelloWorld unit tests", async () => {
 
 		describe("Failure cases", async () => {
 			it("reverts when other account tries to change message", async () => {
+				const {helloWorld, otherAccount} = await loadFixture(deployHelloWorldFixture);
 
+				await expect(helloWorld.connect(otherAccount).setMessage("New message")).to.be.revertedWith("Caller must be the owner");
 			});
 			it("reverts when new message is empty", async () => {
+				const {helloWorld, owner} = await loadFixture(deployHelloWorldFixture);
 
+				await expect(helloWorld.connect(owner).setMessage("")).to.be.revertedWith("Empty string not allowed");
 			});
 		});
 	});
